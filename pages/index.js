@@ -1,10 +1,13 @@
 import config from "../config.json"
 import styled from "styled-components"
 import {CSSReset} from "../src/components/CSSReset";
-import Menu from "../src/components/Menu";
+import Menu from "../src/components/Menu/index";
 import {StyledTimeline} from "../src/components/Timeline";
+import React from "react";
 
 const HomePage = () => {
+    const [valorDoFiltro, setValorDoFiltro] = React.useState("Angular");
+    // const valorDoFiltro = "Angular"
     return (
         <>
             <CSSReset/>
@@ -13,9 +16,9 @@ const HomePage = () => {
                 flexDirection: "column",
                 flex: 1
             }}>
-                <Menu/>
+                <Menu valorDoFiltro={valorDoFiltro} setValorDoFiltro={setValorDoFiltro}/>
                 <Header/>
-                <Timeline playlists={config.playlists}/>
+                <Timeline searchValue={valorDoFiltro} playlists={config.playlists}/>
             </div>
         </>
     )
@@ -33,54 +36,68 @@ const StyledHeader = styled.div`
   }
 
   .user-info {
-    margin-top: 50px;
     display: flex;
     align-items: center;
     width: 100%;
-    padding: 16px 32px;
+    padding: 8px 32px;
     gap: 16px;
+    margin-top: 10px;
   }`;
 
+const StyledBanner = styled.section`
+  margin-top: 50px;
+  background-image: url(${({bg}) => bg});
+  background-color: #CCC;
+  color: black;
+  height: 250px;
+`;
 
 const Header = () => {
     return (
         <StyledHeader>
             {/*<img src="banner"/>*/}
+            <StyledBanner bg={config.bg}/>
             <section className="user-info">
                 <img src={`https://github.com/${config.github}.png`}/>
-                <div>
-                    <h2>{config.name}</h2>
-                    <p>{config.job}</p>
+                <div id={"user-info-text-background"}>
+                    <h2 className={"user-info-text"}>{config.name}</h2>
+                    <p className={"user-info-text"}>{config.job}</p>
                 </div>
             </section>
         </StyledHeader>)
 }
-const Timeline = (props) => {
+
+const Timeline = ({searchValue, ...props}) => {
     const playlistNames = Object.keys(props.playlists)
     //Statement
     //retorno por expressao
     return (
         <StyledTimeline>
-            {
-                playlistNames.map((playlistname) => {
-                        const videos = props.playlists[playlistname];
-                        return (
-                            <section>
-                                <h2>{playlistname}</h2>
-                                <div>
-                                    {videos.map((video) => {
+            {playlistNames.map((playlistname) => {
+                    const videos = props.playlists[playlistname];
+                    return (
+                        <section key={props.playlists[playlistname].toString()}>
+                            <h2>{playlistname}</h2>
+                            <div>
+                                {videos.filter((video) => {
+                                    const titleNormalized = video.title.toLowerCase()
+                                    const searchValueNormalized = searchValue.toLowerCase()
+                                    return titleNormalized.includes(searchValueNormalized)
+                                })
+
+                                    .map((video) => {
                                         return (
-                                            <a href={video.url}>
+                                            <a key={video.thumb} href={video.url}>
                                                 <img alt={"thumb"} src={video.thumb}/>
                                                 <span>{video.title}</span>
                                             </a>
                                         )
                                     })}
-                                </div>
-                            </section>
-                        )
-                    }
-                )
+                            </div>
+                        </section>
+                    )
+                }
+            )
             }
         </StyledTimeline>)
 }
