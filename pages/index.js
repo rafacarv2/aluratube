@@ -6,7 +6,7 @@ import {StyledTimeline} from "../src/components/Timeline";
 import React from "react";
 
 const HomePage = () => {
-    const [valorDoFiltro, setValorDoFiltro] = React.useState("Angular");
+    const [valorDoFiltro, setValorDoFiltro] = React.useState("A");
     // const valorDoFiltro = "Angular"
     return (
         <>
@@ -29,6 +29,8 @@ export default HomePage
 
 
 const StyledHeader = styled.div`
+  background-color: ${(theme) => theme.backgroundLevel1};
+
   img {
     width: 80px;
     height: 80px;
